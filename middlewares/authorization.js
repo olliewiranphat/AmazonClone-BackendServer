@@ -5,10 +5,10 @@ const { clerkClient } = require('@clerk/express')
 
 //Login??? : if Logined, will get Token from CLERK
 module.exports = TryCatch(async (req, res, next) => {
-    // console.log('req.auth', req.auth);
-    ///// Check Login??? : if Logined, will have userId == clerkID in DB
+    // console.log('req.auth >>>', req.auth);
+    // ///// Check Login??? : if Logined, will have userId at req.auth of Clerk from ClerkToken
     const clerkID = req.auth.userId //== Token (req.body), want userdata from CLERK
-    // console.log('clerkID', clerkID);
+    // console.log('clerkID >>>', clerkID);
     ///// Autorize :
     if (!clerkID) { //!== Logined
         return createError(401, "Unauthorized!")
@@ -18,6 +18,8 @@ module.exports = TryCatch(async (req, res, next) => {
     // console.log('Userdata#Clerk >>>>>', userClerk);
 
     req.user = userClerk //assign in req.user
+    // console.log('req.user >>>>>', req.user);
+
 
     next() //next to do Controller/next MW
 })

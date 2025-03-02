@@ -12,6 +12,7 @@ const sellerRouter = require('./router/sellerRouter')
 const adminRouter = require('./router/adminRouter')
 const categoryRouter = require('./router/categoryRouter')
 const { clerkMiddleware } = require('@clerk/express')
+const productRouter = require('./router/productRouter')
 
 ///// Middlewares :
 app.use(clerkMiddleware()) //req.auth
@@ -24,6 +25,9 @@ app.use(morgan('dev'))
 ///// Router : 
 app.use('/user', userRouter)
 app.use('/seller-center', sellerRouter)
+
+
+
 app.use('/admin', adminRouter)
 app.use('/category', categoryRouter)
 

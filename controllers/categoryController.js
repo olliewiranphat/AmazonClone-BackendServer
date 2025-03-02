@@ -20,6 +20,18 @@ exports.addCategory = TryCatch(async (req, res) => {
 
 exports.getAllCategories = TryCatch(async (req, res) => {
     const allCategories = await prisma.category.findMany()
-    console.log('allCategories', allCategories);
+    // console.log('allCategories >>>', allCategories);
     res.status(200).json({ message: "SUCCESS Get All Categories", results: allCategories })
+})
+
+exports.updateCategory = TryCatch(async (req, res) => {
+    console.log('req,body', req.body);
+
+    res.status(200).json({ status: "SUCCESS", message: "Update Category already" })
+})
+
+exports.deleteCategory = TryCatch(async (req, res) => {
+    console.log('req.params', req.params);
+    const results = await prisma.category.delete({ where: { categoryID: Number(req.params.categoryID) } })
+    res.status(200).json({ status: "SUCCESS", message: "Delete Category already", results })
 })

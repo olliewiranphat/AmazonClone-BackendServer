@@ -2,6 +2,11 @@ const express = require('express')
 const userRouter = express.Router()
 const { userRegister, userSignin, userAccount, userOrderHistory, userCart, userUpdate, deleteUser } = require('../controllers/userController')
 const authorization = require('../middlewares/authorization')
+const { PDCategoryID, searchProduct } = require('../controllers/productController')
+
+///// User SEARCH Product:
+userRouter.get('/search-products', searchProduct)
+
 
 ///// DONT USE THESE NOW : GOT USER DATA FROM CLERK
 userRouter.post('/register', userRegister)
@@ -14,6 +19,9 @@ userRouter.put('/update-account', authorization, userUpdate)
 userRouter.delete('/delete-account', authorization, deleteUser)
 userRouter.get('/order-history', authorization, userOrderHistory)
 userRouter.get('/cart', authorization, userCart)
+
+
+
 
 
 

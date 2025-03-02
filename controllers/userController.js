@@ -112,12 +112,11 @@ exports.userUpdate = TryCatch(async (req, res) => {
 
 exports.deleteUser = TryCatch(async (req, res) => {
     console.log('req.user', req.user); //from authorization
-    const { userID } = req.user
-    console.log('userID', userID);
-    ///// Delete User by userID in DB :
-    await prisma.user.delete({
-        where: { userID }
-    })
+    // const { clerkID } = req.user
+    // ///// Delete User by userID in DB :
+    // await prisma.user.delete({
+    //     where: { clerkID }
+    // })
 
     res.status(200).json({ status: "SUCCESS", message: "Delete already!" })
 })
