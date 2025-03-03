@@ -81,7 +81,7 @@ exports.userSignin = TryCatch(async (req, res) => {
 })
 
 ///// API Update User data : /user/upadte-account
-exports.userUpdate = TryCatch(async (req, res) => {
+exports.userCreateUpdateDB = TryCatch(async (req, res) => {
 
     // console.log('req.body', req.body); //get new user data to update
     const { firstName, lastName, email, phoneNumber, birthDay, gender, role, imageUrl } = req.body
@@ -110,14 +110,30 @@ exports.userUpdate = TryCatch(async (req, res) => {
     res.status(200).json({ status: "SUCCESS", message: "Updated already!", updateUserData })
 })
 
+exports.userUpdateImageAccount = TryCatch(async (req, res) => {
+    const results = await cloudinary.uploader.upload(req.body.images, { // Keep Image files on Cloudinary, in DB just keep URL Link
+        folder: "ProductImage",
+        public_id: Date.now(),
+        resource_type: 'auto'
+    })
+    res.status(200).json({ message: "SUCCESS, Add Images at Cloudinary!", results }) //send to Frontend
+})
+
 exports.deleteUser = TryCatch(async (req, res) => {
     console.log('req.user', req.user); //from authorization
-    // const { clerkID } = req.user
-    // ///// Delete User by userID in DB :
-    // await prisma.user.delete({
-    //     where: { clerkID }
-    // })
+    const { id } = req.user
+    ///// Delete User Account at Clerk database :
+    await clerkClient.users.deleteUser(id)
 
+    const findUserDB = await prisma.user.findFirst({ where: { clerkID: "12adb" } })
+    if (!findUserDB) {
+        return res.status(200).json({ status: "SUCCESS", message: "No have user in DB, delete just Clerk" })
+    } else {
+        // await prisma.user.delete({ where: { clerkID: id } })
+    }
+
+
+    ////// DELETE User at Clerk???
     res.status(200).json({ status: "SUCCESS", message: "Delete already!" })
 })
 

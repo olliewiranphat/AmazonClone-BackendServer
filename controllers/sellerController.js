@@ -12,9 +12,7 @@ exports.getMyProducts = TryCatch(async (req, res) => {
     // console.log('userID', userID);
     const results = await prisma.product.findMany({
         where: { userID: Number(userID) },
-        include: {
-            productImage: true
-        }
+        include: { productImage: true }
     })
     console.log('results', results);
 
@@ -29,6 +27,7 @@ exports.sellerADDProduct = TryCatch(async (req, res) => { //Only SELLER get to t
     ///// Get userID in DB where clerkID :
     const userDataDB = await prisma.user.findFirst({ where: { clerkID: req.user.id } })
     console.log('userDataDB >>>', userDataDB);
+    !userDataDB && createError(400, "Not found this user")
     ///// get userID to add in Product Table :
     const { userID } = userDataDB
     console.log('userID >>>', userID);
@@ -43,31 +42,90 @@ exports.sellerADDProduct = TryCatch(async (req, res) => { //Only SELLER get to t
     })
     console.log('productData >>>', productData);
     ///// get ProductID where ProductName: to add ProductImage in DB, using productID
-    const productDB = await prisma.product.findFirst({ where: { productID: productData.productID } })
-    console.log('productID', productDB);
-    const { productID } = productDB
+    const productDB = await prisma.product.findFirst({ where: { productID: parseInt(productData.productID) } })
+
     ///// Add ImageProduct into DB:
-    const responseImage = await prisma.productImage.createMany({
-        data: imageData.map(el => {
-            return { productID: Number(productID), productImage: el.secure_url }
+    const productImages = await prisma.productImage.createMany({
+        data: imageData.map(({ secure_url, public_id }) => {
+            return { productID: productDB.productID, productImage: secure_url, public_id }
         })
     })
-    console.log('responseImage', responseImage);
-    res.status(200).json({ status: "SUCCESS", message: "Add product already!", results: { ...productData, ...responseImage } })
+    console.log('productImages', productImages);
+    res.status(200).json({ status: "SUCCESS", message: "Add product already!", results: { ...productData, ...productImages } })
 })
-
 
 exports.sellerUPDATEProduct = TryCatch(async (req, res) => {
-    console.log(' req.user', req.user);
-    console.log(' req.param', req.params);
+    console.log('req.params:', req.params);
+    console.log('value:', req.body.value);
+    console.log('imageData:', req.body.imageData);
 
-    ///// Find : customer(userData), all-products, ProductonOrder, Order-TotalPrice(Sale), rating, reviewPost
-    res.status(200).json({ status: "SUCCESS", message: "Update Product already!" })
-})
+    const { value, imageData } = req.body;
+    const productID = parseInt(req.params.productID);
+
+    if (!productID) {
+        return res.status(400).json({ status: "ERROR", message: "Invalid Product ID" });
+    }
+
+    // Step 1: Update Product Details (excluding images)
+    const updatedProduct = await prisma.product.update({
+        where: { productID: parseInt(req.params.productID) },
+        data: {
+            ...value,
+            categoryID: parseInt(value.categoryID),
+            price: parseInt(value.price),
+            stockQuantity: parseInt(value.stockQuantity)
+        }
+    });
+
+    console.log('Updated Product:', updatedProduct);
+
+    // Step 2: Handle Image Updates
+    if (imageData && imageData.length > 0) {
+        // Option 1: Delete old images before inserting new ones (Recommended if replacing all images)
+        await prisma.productImage.deleteMany({ where: { productID: parseInt(req.params.productID) } });
+
+        // Insert new images
+        const UpdateImages = await prisma.productImage.createMany({
+            data: imageData.map(el => ({
+                productID: parseInt(req.params.productID),
+                productImage: el.secure_url || el.productImage,
+                public_id: el.public_id
+            }))
+        });
+        console.log('Images replaced successfully.', UpdateImages);
+    }
+
+    // Alternative Approach (If You Want to Update Instead of Delete Old Images)
+
+    // const updateImages = await Promise.all(imageData.map(async (el) => {
+    //     await prisma.productImage.upsert({
+    //         where: { productID: parseInt(req.params.productID) },  // If image exists, update it
+    //         update: {
+    //             secure_url: el.secure_url,
+    //             public_id: el.public_id
+    //         },
+    //         create: {
+    //             productID,
+    //             secure_url: el.secure_url,
+    //             public_id: el.public_id
+    //         }
+    //     });
+    // }));
+    // console.log('Images updated successfully.', updateImages);
+
+
+    res.status(200).json({ status: "SUCCESS", message: "Product updated successfully!" });
+});
 
 exports.sellerDELETEProduct = TryCatch(async (req, res) => {
     console.log(' req.param', req.params);
-    const results = prisma.product.delete({ where: { productID: parseInt(req.params.productID) } })
+    console.log("DELETE ProductID");
+
+    const results = await prisma.product.deleteMany({
+        where: { productID: parseInt(req.params.productID) }
+    })
+    console.log('results', results);
+
     ///// Find : customer(userData), all-products, ProductonOrder, Order-TotalPrice(Sale), rating, reviewPost
     res.status(200).json({ status: "SUCCESS", message: "Delete Product already!" })
 })

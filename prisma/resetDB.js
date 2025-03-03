@@ -16,4 +16,4 @@ async function resetDB() {
 }
 
 console.log("Resetting DB...");
-resetDB();
+resetDB(); //npm prosma resetDB

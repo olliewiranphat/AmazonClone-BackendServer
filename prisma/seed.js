@@ -160,4 +160,4 @@ async function seedDB() {
     await prisma.category.createMany({ data: categoryData })
 }
 
-seedDB()
+seedDB() // npx prisma db seed
