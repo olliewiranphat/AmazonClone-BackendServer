@@ -12,23 +12,23 @@ const sellerRouter = require('./router/sellerRouter')
 const adminRouter = require('./router/adminRouter')
 const categoryRouter = require('./router/categoryRouter')
 const { clerkMiddleware } = require('@clerk/express')
-const productRouter = require('./router/productRouter')
+
 
 ///// Middlewares :
 app.use(clerkMiddleware()) //req.auth
 ///// Connect Frontend - Backend :
 app.use(cors({ origin: 'http://localhost:5173' }))
 ///// Read JSON req.body from Frontend :
-app.use(express.json({ limit: "10mb" }))
+app.use(express.json({ limit: "10mb" })) //Max Payload size Server can receive
 app.use(morgan('dev'))
 
 ///// Router : 
 app.use('/user', userRouter)
+
 app.use('/seller-center', sellerRouter)
 
-
-
 app.use('/admin', adminRouter)
+
 app.use('/category', categoryRouter)
 
 
@@ -37,6 +37,5 @@ app.use(NotFound)
 
 ///// error from path and router
 app.use(errorHandler)
-
 
 app.listen(port, () => console.log(`Server is running on PORT ${port}`))

@@ -95,9 +95,6 @@ exports.searchProducts = async (req, res, next) => {
     }
 }
 
-exports.addPDCart = TryCatch(async (req, res) => {
-    res.status(200).json({ status: "SUCCESS ADD PD to Cart" });
-})
 
 exports.orderPayment = TryCatch(async (req, res) => {
     res.status(200).json({ status: "SUCCESS Order Payment" });

@@ -21,6 +21,12 @@ exports.getAllProductsDB = TryCatch(async (req, res) => {
             productImage: true //include to get productImage data too
         }
     });
+    res.status(200).json({ message: "Success Get All Products DB", results })
+})
+
+exports.getAllSellers = TryCatch(async (req, res) => {
+    ///// Get all products in DB:
+    const results = await prisma.user.findMany({ where: { role: "SELLER" } });
 
 
     res.status(200).json({ message: "Success Get All Products DB", results })

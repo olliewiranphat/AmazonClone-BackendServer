@@ -57,7 +57,7 @@ exports.sellerADDProduct = TryCatch(async (req, res) => { //Only SELLER get to t
 exports.sellerUPDATEProduct = TryCatch(async (req, res) => {
     console.log('req.params:', req.params);
     console.log('value:', req.body.value);
-    console.log('imageData:', req.body.imageData);
+    console.log('imageData:', req.body.imageData); //from Cloundinary (Delete Old Images, and Add New Images)
 
     const { value, imageData } = req.body;
     const productID = parseInt(req.params.productID);
@@ -94,26 +94,6 @@ exports.sellerUPDATEProduct = TryCatch(async (req, res) => {
         });
         console.log('Images replaced successfully.', UpdateImages);
     }
-
-    // Alternative Approach (If You Want to Update Instead of Delete Old Images)
-
-    // const updateImages = await Promise.all(imageData.map(async (el) => {
-    //     await prisma.productImage.upsert({
-    //         where: { productID: parseInt(req.params.productID) },  // If image exists, update it
-    //         update: {
-    //             secure_url: el.secure_url,
-    //             public_id: el.public_id
-    //         },
-    //         create: {
-    //             productID,
-    //             secure_url: el.secure_url,
-    //             public_id: el.public_id
-    //         }
-    //     });
-    // }));
-    // console.log('Images updated successfully.', updateImages);
-
-
     res.status(200).json({ status: "SUCCESS", message: "Product updated successfully!" });
 });
 
@@ -129,11 +109,6 @@ exports.sellerDELETEProduct = TryCatch(async (req, res) => {
     ///// Find : customer(userData), all-products, ProductonOrder, Order-TotalPrice(Sale), rating, reviewPost
     res.status(200).json({ status: "SUCCESS", message: "Delete Product already!" })
 })
-
-
-
-
-
 
 
 ///// API Seller Dashboard : /seller-center/dashboard --> SellerData-ProductData-OrderData-ProductOnOrder
