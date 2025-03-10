@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 require('dotenv').config()
-const port = process.env.PORT || 8080
+const port = process.env.PORT
 const NotFound = require('./middlewares/NotFound')
 const errorHandler = require('./middlewares/errorHandler')
 const cors = require('cors')
@@ -17,7 +17,7 @@ const { clerkMiddleware } = require('@clerk/express')
 ///// Middlewares :
 app.use(clerkMiddleware()) //req.auth
 ///// Connect Frontend - Backend :
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors())
 ///// Read JSON req.body from Frontend :
 app.use(express.json({ limit: "10mb" })) //Max Payload size Server can receive
 app.use(morgan('dev'))
